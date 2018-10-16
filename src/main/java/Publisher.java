@@ -14,9 +14,11 @@ import com.google.gson.JsonSyntaxException;
 public class Publisher<T> implements Runnable{
 	private String input;
 	private Broker<T> b;
+//	private static int count;
 	
 	public Publisher(String input, Broker<T> b) {
 //		System.out.println(input);
+//		count = 0;
 		this.input = input;
 		this.b = b;
 	}
@@ -28,7 +30,7 @@ public class Publisher<T> implements Runnable{
 		//read the file
 		try(BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(input)));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "ISO-8859-1"),10 * 1024 * 1024)){
-//			System.out.println("gogogo");
+			System.out.println("gogogo");
 			String line = reader.readLine();
 //			System.out.println(line);
 			while(line != null) {
@@ -42,6 +44,7 @@ public class Publisher<T> implements Runnable{
 				if(element.isJsonObject()) {
 					JsonObject jo = (JsonObject) element;
 					T t = (T) jo;
+//					System.out.println(count++);
 					b.publish(t);
 				}	
 				line = reader.readLine();

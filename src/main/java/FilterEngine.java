@@ -29,15 +29,15 @@ public class FilterEngine {
 	}
 	
 	public void SetReadConfig() {
-		try(Scanner s = new Scanner(System.in)){
-			System.out.println("Welcome, do you want to set up the config? "
-				+ "If you choose no, you will use the default setting. Y/N");
-			String input = s.nextLine();
-			input = input.toLowerCase();
-			if(input.equals("y")) {
-			ConfigSetter.set(this.config);
-			}
-		}
+//		try(Scanner s = new Scanner(System.in)){
+//			System.out.println("Welcome, do you want to set up the config? \n"
+//				+ "If you choose no, you will use the default setting. Y/N");
+//			String input = s.nextLine();
+//			input = input.toLowerCase();
+//			if(input.equals("y")) {
+//			ConfigSetter.set(this.config);
+//			}
+//		}
 		this.readConfig();
 	}
 	
@@ -120,6 +120,8 @@ public class FilterEngine {
 		b.shutdown();
 		long end = System.currentTimeMillis();
 		System.out.println(brokerType + " run time: " + (end - start));
+//		s1.write();
+//		s2.write();
 		s1.print();
 		s2.print();
 	}
