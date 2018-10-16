@@ -9,12 +9,12 @@ import com.google.gson.JsonParser;
 
 public class FilterEngine {
 	private String config;
-	private String input1;
-	private String input2;
-	private String output1;
-	private String output2;
+	private String input1, input2;
+	private String output1, output2;
 	private String timeFlag;
 	private String brokerType;
+	private int queueOrPoolSize;
+	private long timeOut;
 	
 	private Broker b;
 	private Thread t1;
@@ -23,6 +23,8 @@ public class FilterEngine {
 	private ReviewSubscriber s2;
 	
 	public FilterEngine(String config) {
+		this.queueOrPoolSize = -1;
+		this.timeOut = -1;
 		this.config = config;
 	}
 	
@@ -51,6 +53,8 @@ public class FilterEngine {
 			this.output2 = o.get("output2").getAsString();
 			this.timeFlag = o.get("timeFlag").getAsString();
 			this.brokerType = o.get("brokerType").getAsString();
+			this.queueOrPoolSize = o.get("size").getAsInt();
+			this.timeOut = o.get("timeOut").getAsLong();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,9 +67,24 @@ public class FilterEngine {
 			System.out.println("not enough args");
 			return false;
 		}
+		if(input1.equals("") || input2.equals("") || output1.equals("")
+		|| output2.equals("") || timeFlag.equals("") || brokerType.equals("")) {
+			System.out.println("not enough args");
+			return false;
+		}
 		if(!brokerType.equals("sob") && !brokerType.equals("aob") && !brokerType.equals("aub")) {
 			System.out.println("broker type invalid");
 			return false;
+		}
+		if(brokerType.equals("aob") || brokerType.equals("aub")) {
+			if(queueOrPoolSize == -1) {
+				System.out.println("need queue size");
+				return false;
+			}
+			if(brokerType.equals("aob") && timeOut == -1) {
+				System.out.println("need max waiting time");
+				return false;
+			}
 		}
 		return true;
 	}
@@ -74,9 +93,9 @@ public class FilterEngine {
 		if(this.brokerType.equals("sob")) {
 			b = new SynchronousOrderedDispatchBroker();
 		}else if(this.brokerType.equals("aob")) {
-			b = new AsyncOrderedDispatchBroker();
+			b = new AsyncOrderedDispatchBroker(this.queueOrPoolSize, this.timeOut);
 		}else {
-			b = new AsyncUnorderedDispatchBroker();
+			b = new AsyncUnorderedDispatchBroker(this.queueOrPoolSize);
 		}
 		t1 = new Thread(new Publisher(input1, b));
 		t2 = new Thread(new Publisher(input2, b));
@@ -98,7 +117,10 @@ public class FilterEngine {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		b.shutdown();
 		long end = System.currentTimeMillis();
-		System.out.println("run time: " + (end - start));
+		System.out.println(brokerType + " run time: " + (end - start));
+		s1.print();
+		s2.print();
 	}
 }

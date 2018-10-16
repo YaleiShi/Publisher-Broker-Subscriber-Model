@@ -23,7 +23,6 @@ public class AmazonFilter {
 		}
 		
 		engine.setUp();
-		
 		engine.start();
 		
 	}

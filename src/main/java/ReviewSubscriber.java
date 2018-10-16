@@ -8,7 +8,7 @@ public class ReviewSubscriber<T> implements Subscriber<T> {
 	private String timeFlag;
 	private String output;
 	private BufferedWriter writer;
-	private static int newTime;
+	private int newTime;
 	private boolean ifNew;
 	
 	public ReviewSubscriber(String timeFlag, String output, boolean ifNew) {
@@ -25,7 +25,7 @@ public class ReviewSubscriber<T> implements Subscriber<T> {
 	}
 
 	@Override
-	public void onEvent(T item) {
+	public synchronized void onEvent(T item) {
 		// TODO Auto-generated method stub
 		JsonObject review = (JsonObject) item;
 		String time = review.get("unixReviewTime").getAsString();
@@ -40,6 +40,7 @@ public class ReviewSubscriber<T> implements Subscriber<T> {
 			}
 		}
 	}
+	
 	
 	public void print() {
 		System.out.println("new: " + newTime);

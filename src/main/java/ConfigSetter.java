@@ -6,12 +6,12 @@ import java.util.Scanner;
 import com.google.gson.JsonObject;
 
 public class ConfigSetter {
-	private static String input1;
-	private static String input2;
-	private static String output1;
-	private static String output2;
+	private static String input1, input2;
+	private static String output1, output2;
 	private static String time;
 	private static String brokerType;
+	private static String size;
+	private static String timeOut;
 
 	public static void set(String config) {
 		try(Scanner s = new Scanner(System.in)){
@@ -30,6 +30,10 @@ public class ConfigSetter {
 				+ "aob - AsyncOrderedDispatchBroker\n"
 				+ "aub - AsyncUnorderedDispatchBroker");
 			brokerType = s.nextLine();
+			System.out.println("Please enter the queue or thread pool size");
+			size = s.nextLine();
+			System.out.println("Please enter the max waiting time");
+			timeOut = s.nextLine();
 		}
 		
 		write(config);
@@ -44,6 +48,8 @@ public class ConfigSetter {
 		config.addProperty("output2", output2);
 		config.addProperty("timeFlag", time);
 		config.addProperty("brokerType", brokerType);
+		config.addProperty("size", size);
+		config.addProperty("timeOut", timeOut);
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))){
 			writer.write(config.toString());
 		} catch (IOException e) {
