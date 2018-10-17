@@ -1,3 +1,4 @@
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,29 +11,42 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-
+/**
+ * the publisher class to read the input file and parse the line
+ * into object, then publish the item into the broker
+ * @author yalei
+ *
+ * @param <T>
+ */
 public class Publisher<T> implements Runnable{
 	private String input;
 	private Broker<T> b;
-//	private static int count;
+	private int count;
 	
+	/**
+	 * take the input file path and broker into the data member
+	 * @param input
+	 * @param b
+	 */
 	public Publisher(String input, Broker<T> b) {
-//		System.out.println(input);
-//		count = 0;
+		count = 0;
 		this.input = input;
 		this.b = b;
 	}
 
+	/**
+	 * read the input file, parse the line into objects
+	 * then publish the object item into broker
+	 */
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		JsonParser parser = new JsonParser();
-		//read the file
+		
 		try(BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(input)));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "ISO-8859-1"),10 * 1024 * 1024)){
-			System.out.println("gogogo");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "ISO-8859-1"), 10 * 1024 * 1024)){
+			//test if the reading file is correct
+			System.out.println("start parsing " + input);
 			String line = reader.readLine();
-//			System.out.println(line);
 			while(line != null) {
 				JsonElement element;
 				try {
@@ -42,10 +56,8 @@ public class Publisher<T> implements Runnable{
 					continue;
 				}	
 				if(element.isJsonObject()) {
-					JsonObject jo = (JsonObject) element;
-					T t = (T) jo;
-//					System.out.println(count++);
-					b.publish(t);
+					count++;
+					b.publish((T) element);
 				}	
 				line = reader.readLine();
 			}	
@@ -55,5 +67,13 @@ public class Publisher<T> implements Runnable{
 			System.out.println(ioe.getMessage());
 		}
 		
+	}
+	
+	/**
+	 * get how many lines have been readed
+	 * @return
+	 */
+	public int getCount() {
+		return this.count;
 	}
 }

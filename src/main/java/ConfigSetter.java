@@ -1,3 +1,4 @@
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -5,6 +6,11 @@ import java.util.Scanner;
 
 import com.google.gson.JsonObject;
 
+/**
+ * the class to set the config file
+ * @author yalei
+ *
+ */
 public class ConfigSetter {
 	private static String input1, input2;
 	private static String output1, output2;
@@ -13,6 +19,11 @@ public class ConfigSetter {
 	private static String size;
 	private static String timeOut;
 
+	/**
+	 * read the input from system.in
+	 * guide the user to setup config
+	 * @param config
+	 */
 	public static void set(String config) {
 		try(Scanner s = new Scanner(System.in)){
 			System.out.println("Please enter the first input path");
@@ -39,6 +50,10 @@ public class ConfigSetter {
 		write(config);
 	}
 	
+	/**
+	 * write the content to the path
+	 * @param configFile
+	 */
 	public static void write(String configFile) {
 		System.out.println("Writing...");
 		JsonObject config = new JsonObject();
@@ -57,9 +72,5 @@ public class ConfigSetter {
 			e.printStackTrace();
 		}
 		System.out.println("Wrtting complete");
-	}
-	
-	public static void read(FilterEngine engine) {
-		
 	}
 }

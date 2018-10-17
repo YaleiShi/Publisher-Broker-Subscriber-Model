@@ -1,23 +1,36 @@
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import com.google.gson.JsonObject;
 
+/**
+ * ReveiwSubscriber class
+ * take the item and judge if the item is needed
+ * write the item into the output file
+ * @author yalei
+ *
+ * @param <T>
+ */
 public class ReviewSubscriber<T> implements Subscriber<T> {
-	private String timeFlag;
+	private long timeFlag;
 	private String output;
 	private BufferedWriter writer;
-//	private StringBuffer sb;
-	private int newTime;
 	private boolean ifNew;
 	
-	public ReviewSubscriber(String timeFlag, String output, boolean ifNew) {
-		newTime = 0;
+	/**
+	 * take the timeFlag as the flag to decide if the item is needed
+	 * take the output file as the file path to write to file
+	 * take ifNew to decide if the subscriber need new reviews
+	 * @param timeFlag
+	 * @param output
+	 * @param ifNew
+	 */
+	public ReviewSubscriber(long timeFlag, String output, boolean ifNew) {
 		this.timeFlag = timeFlag;
 		this.output = output;
 		this.ifNew = ifNew;
-//		sb = new StringBuffer();
 		try {
 			writer = new BufferedWriter(new FileWriter(this.output));
 		} catch (IOException e) {
@@ -26,38 +39,41 @@ public class ReviewSubscriber<T> implements Subscriber<T> {
 		}
 	}
 
+	/**
+	 * get the item and decide if write the item to the file
+	 */
 	@Override
-	public synchronized void onEvent(T item) {
+	public void onEvent(T item) {
 		// TODO Auto-generated method stub
 		JsonObject review = (JsonObject) item;
-		String time = review.get("unixReviewTime").getAsString();
-		if((ifNew && time.compareTo(this.timeFlag) >= 0) || 
-		   (!ifNew && time.compareTo(this.timeFlag) < 0)) {
-			try {
-				this.writer.write(review.toString() + "\n");
-				newTime++;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		long time = review.get("unixReviewTime").getAsLong();
+		if(ifNew) {
+			if(time >= this.timeFlag) {
+				this.write(review);
 			}
-//			sb.append(review.toString() + "\n");
+		}else{
+			if(time < this.timeFlag) {
+				this.write(review);
+			}
 		}
 	}
 	
-//	public void write() {
-//		try(BufferedWriter writer = new BufferedWriter(new FileWriter(this.output))){
-//			writer.write(sb.toString());
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
-	
-	
-	public void print() {
-		System.out.println("new: " + newTime);
+	/**
+	 * write the review into the file
+	 * @param review
+	 */
+	public void write(JsonObject review) {
+		try {
+			writer.write(review.toString() + "\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
+	/**
+	 * close the buffered writer
+	 */
 	public void closeWriter() {
 		try {
 			writer.close();
@@ -66,7 +82,12 @@ public class ReviewSubscriber<T> implements Subscriber<T> {
 			e.printStackTrace();
 		}
 	}
-//	
+
+	
+	/**
+	 * subscribe the subscriber into the broker
+	 * @param b
+	 */
 	public void subscribe(Broker<T> b) {
 		b.subscribe(this);
 	}
